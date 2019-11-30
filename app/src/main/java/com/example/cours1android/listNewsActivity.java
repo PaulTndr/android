@@ -2,8 +2,10 @@ package com.example.cours1android;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
@@ -157,7 +159,7 @@ class WebServiceRequestor extends AsyncTask<String, Void, String> {
         //Si on fait une requete sur /everything
         if(this.URL.contains("/everything")) {
             System.out.println("Refresh articles");
-            ArrayList<News> listNews = new ArrayList<News>();
+            final ArrayList<News> listNews = new ArrayList<News>();
 
             for (int k = 0; k < jsonObject.get("articles").getAsJsonArray().size(); k++) {
                 //News oneNews = new Gson().fromJson(jsonObject.get("articles").getAsJsonArray().get(k), News.class);
@@ -171,6 +173,9 @@ class WebServiceRequestor extends AsyncTask<String, Void, String> {
                 if (!jsonObjectForOneNews.get("urlToImage").isJsonNull()) {
                     oneNews.setImageUrl(jsonObjectForOneNews.get("urlToImage").getAsString());
                 }
+                if (!jsonObjectForOneNews.get("url").isJsonNull()) {
+                    oneNews.setUrlmatch(jsonObjectForOneNews.get("url").getAsString());
+                }
                 listNews.add(oneNews);
             }
 
@@ -178,8 +183,18 @@ class WebServiceRequestor extends AsyncTask<String, Void, String> {
             NewsAdapter adapter = new NewsAdapter(activity, listNews);
             myListView.setAdapter(adapter);
             adapter.notifyDataSetChanged();
+            myListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                public void onItemClick(AdapterView<?> parent, View view,
+                                        int position, long id) {
+                    String url = listNews.get(position).getUrlmatch();
+                    if (url != null && !url.equals(new String())){
+                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                        view.getContext().startActivity(intent);
+                    }
+                }
+            });
+            super.onPostExecute(result);
         }
-        super.onPostExecute(result);
     }
 
     @Override
