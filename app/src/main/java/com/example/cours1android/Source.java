@@ -1,6 +1,8 @@
 package com.example.cours1android;
 
-public class Source {
+import java.io.Serializable;
+
+public class Source implements Serializable {
     private String idUrl;
     private String name;
 

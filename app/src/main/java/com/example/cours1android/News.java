@@ -1,12 +1,16 @@
 package com.example.cours1android;
 
-public class News {
+import java.io.Serializable;
+
+public class News implements Serializable {
 
     private String imageUrl;
     private String titre;
     private String autor;
     private String date;
     private String urlMatch;
+    private Source source;
+    private String description;
 
     public News(){}
 
@@ -16,6 +20,7 @@ public class News {
         this.autor = autor;
         this.date = date;
         this.urlMatch = urlmatch;
+        this.description = description;
     }
 
     public String getImageUrl() {
@@ -58,6 +63,22 @@ public class News {
         this.urlMatch = urlMatch;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Source getSource() {
+        return source;
+    }
+
+    public void setSource(Source source) {
+        this.source = source;
+    }
+
     public void print() {
        System.out.println("News{" +
                "imageUrl='" + imageUrl + '\'' +
@@ -65,6 +86,7 @@ public class News {
                ", autor='" + autor + '\'' +
                ", date='" + date + '\'' +
                ", urlMatch='" + urlMatch + '\'' +
+               ", description='" + description + '\'' +
                '}');
     }
 }

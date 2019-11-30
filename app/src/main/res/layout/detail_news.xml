@@ -7,16 +7,16 @@
 
     <TextView
         android:id="@+id/titre"
-        android:layout_width="184dp"
-        android:layout_height="28dp"
+        android:layout_width="275dp"
+        android:layout_height="24dp"
         android:text="Titre"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/date"
-        android:layout_width="227dp"
-        android:layout_height="28dp"
+        android:layout_width="137dp"
+        android:layout_height="26dp"
         android:text="Date"
         app:layout_constraintStart_toEndOf="@+id/titre"
         app:layout_constraintTop_toTopOf="parent" />

@@ -51,6 +51,7 @@ import java.util.List;
 public class listNewsActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
     ArrayList<Source> listSources = new ArrayList<Source>();
+    String sourceName;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,7 +63,9 @@ public class listNewsActivity extends AppCompatActivity implements AdapterView.O
 
         //On récupère la liste des articles pour une source
         new WebServiceRequestor(this, "https://newsapi.org/v2/everything?apiKey=d31f5fa5f03443dd8a1b9e3fde92ec34&language=fr&sources=google-news-fr",params).execute();
+        this.sourceName = "Google News (France)";
     }
+
 
     public void onItemSelected(AdapterView<?> parent, View view,
                                int pos, long id) {
@@ -71,6 +74,7 @@ public class listNewsActivity extends AppCompatActivity implements AdapterView.O
 
         for(int k=0; k<this.listSources.size();k++){
             if(parent.getItemAtPosition(pos).toString()==this.listSources.get(k).getName()){
+                this.sourceName=this.listSources.get(k).getName();
                 complementUrl=this.listSources.get(k).getIdUrl();
             }
         }
@@ -140,10 +144,10 @@ class WebServiceRequestor extends AsyncTask<String, Void, String> {
             ArrayList<String> listSourcesName = new ArrayList<String>();
             ArrayList<Source> listSources = new ArrayList<Source>();
             for (int k = 0; k < jsonObject.get("sources").getAsJsonArray().size(); k++) {
-                JsonObject jsonObjectForOneNews = jsonObject.get("sources").getAsJsonArray().get(k).getAsJsonObject();
+                JsonObject jsonObjectForOneSource = jsonObject.get("sources").getAsJsonArray().get(k).getAsJsonObject();
                 Source oneSource = new Source();
-                oneSource.setIdUrl(jsonObjectForOneNews.get("id").getAsString());
-                oneSource.setName(jsonObjectForOneNews.get("name").getAsString());
+                oneSource.setIdUrl(jsonObjectForOneSource.get("id").getAsString());
+                oneSource.setName(jsonObjectForOneSource.get("name").getAsString());
                 listSourcesName.add(oneSource.getName());
                 listSources.add(oneSource);
             }
@@ -176,6 +180,16 @@ class WebServiceRequestor extends AsyncTask<String, Void, String> {
                 if (!jsonObjectForOneNews.get("url").isJsonNull()) {
                     oneNews.setUrlmatch(jsonObjectForOneNews.get("url").getAsString());
                 }
+                if (!jsonObjectForOneNews.get("description").isJsonNull()) {
+                    oneNews.setDescription(jsonObjectForOneNews.get("description").getAsString());
+                }
+                if (!jsonObjectForOneNews.get("source").isJsonNull()) {
+                    JsonObject jsonObjectForOneSource = jsonObjectForOneNews.get("source").getAsJsonObject();
+                    Source oneSource = new Source();
+                    oneSource.setIdUrl(jsonObjectForOneSource.get("id").getAsString());
+                    oneSource.setName(jsonObjectForOneSource.get("name").getAsString());
+                    oneNews.setSource(oneSource);
+                }
                 listNews.add(oneNews);
             }
 
@@ -186,11 +200,15 @@ class WebServiceRequestor extends AsyncTask<String, Void, String> {
             myListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 public void onItemClick(AdapterView<?> parent, View view,
                                         int position, long id) {
-                    String url = listNews.get(position).getUrlmatch();
+
+                    /*String url = listNews.get(position).getUrlmatch();
                     if (url != null && !url.equals(new String())){
                         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
                         view.getContext().startActivity(intent);
-                    }
+                    }*/
+                    Intent monIntent = new Intent(view.getContext(), DetailNewsActivity.class);
+                    monIntent.putExtra("mNews", listNews.get(position));
+                    view.getContext().startActivity(monIntent);
                 }
             });
             super.onPostExecute(result);
