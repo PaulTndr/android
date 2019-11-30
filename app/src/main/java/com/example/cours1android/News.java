@@ -8,6 +8,8 @@ public class News {
     private String date;
     private String urlMatch;
 
+    public News(){}
+
     public News(String imageUrl, String textResume, String autor, String date, String urlmatch) {
         this.imageUrl = imageUrl;
         this.titre = textResume;
@@ -54,5 +56,15 @@ public class News {
 
     public void setUrlmatch(String urlMatch) {
         this.urlMatch = urlMatch;
+    }
+
+    public void print() {
+       System.out.println("News{" +
+               "imageUrl='" + imageUrl + '\'' +
+               ", titre='" + titre + '\'' +
+               ", autor='" + autor + '\'' +
+               ", date='" + date + '\'' +
+               ", urlMatch='" + urlMatch + '\'' +
+               '}');
     }
 }

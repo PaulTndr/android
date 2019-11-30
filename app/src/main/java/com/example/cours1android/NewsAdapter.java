@@ -21,8 +21,10 @@ public class NewsAdapter extends BaseAdapter {
      * @author patrice
      */
     private class ViewHolder {
-        TextView imageUrl;
-        TextView textResume;
+        //TextView imageUrl;
+        TextView titre;
+        TextView autor;
+        TextView date;
     }
     public NewsAdapter(Context context, List<News> objects) {
         inflater = LayoutInflater.from(context);
@@ -42,16 +44,20 @@ public class NewsAdapter extends BaseAdapter {
                 convertView = inflater.inflate(R.layout.rightleft_right, null);
             }
 
-            holder.imageUrl = (TextView) convertView.findViewById(R.id.imageurl);
-            holder.textResume = (TextView) convertView
-                    .findViewById(R.id.textResume);
+            holder.titre = (TextView) convertView
+                    .findViewById(R.id.titre);
+            holder.autor = (TextView) convertView
+                    .findViewById(R.id.autor);
+            holder.date = (TextView) convertView
+                    .findViewById(R.id.date);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
         News oneNews = sourceNews.get(position);
-        holder.imageUrl.setText(oneNews.getImageUrl());
-        holder.textResume.setText(oneNews.getTextResume());
+        holder.titre.setText(oneNews.getTitre());
+        holder.autor.setText(oneNews.getAutor());
+        holder.date.setText(oneNews.getDate());
         return convertView;
     }
     /**
