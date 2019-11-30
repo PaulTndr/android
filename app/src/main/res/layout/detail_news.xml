@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/titre"
+        android:layout_width="184dp"
+        android:layout_height="28dp"
+        android:text="Titre"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/date"
+        android:layout_width="227dp"
+        android:layout_height="28dp"
+        android:text="Date"
+        app:layout_constraintStart_toEndOf="@+id/titre"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/auteur"
+        android:layout_width="410dp"
+        android:layout_height="24dp"
+        android:text="Auteur"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/titre" />
+
+    <TextView
+        android:id="@+id/source"
+        android:layout_width="411dp"
+        android:layout_height="22dp"
+        android:text="Source"
+        android:textColor="#FF5722"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/auteur" />
+
+    <TextView
+        android:id="@+id/description"
+        android:layout_width="412dp"
+        android:layout_height="120dp"
+        android:text="Resume"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/source" />
+
+    <ImageView
+        android:id="@+id/illustration"
+        android:layout_width="412dp"
+        android:layout_height="189dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/description"
+        tools:srcCompat="@tools:sample/backgrounds/scenic" />
+
+    <Button
+        android:id="@+id/read"
+        android:layout_width="199dp"
+        android:layout_height="37dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        android:text="Lire l'article"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/illustration" />
+</androidx.constraintlayout.widget.ConstraintLayout>
