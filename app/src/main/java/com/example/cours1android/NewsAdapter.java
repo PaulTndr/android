@@ -1,12 +1,14 @@
 package com.example.cours1android;
 
 import android.content.Context;
+import android.media.Image;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -14,6 +16,7 @@ public class NewsAdapter extends BaseAdapter {
     List<News> sourceNews;
     // LayoutInflater aura pour mission de charger notre fichier XML
     LayoutInflater inflater;
+    Context context;
     /**
      * Elle nous servira à mémoriser les éléments de la liste en mémoire pour
      * qu’à chaque rafraichissement l’écran ne scintille pas
@@ -21,13 +24,15 @@ public class NewsAdapter extends BaseAdapter {
      * @author patrice
      */
     private class ViewHolder {
-        //TextView imageUrl;
+        ImageView imageUrl;
         TextView titre;
         TextView autor;
         TextView date;
     }
+
     public NewsAdapter(Context context, List<News> objects) {
         inflater = LayoutInflater.from(context);
+        this.context = context;
         this.sourceNews = objects;
     }
     /**
@@ -35,7 +40,7 @@ public class NewsAdapter extends BaseAdapter {
      */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        ViewHolder holder;
+        ViewHolder holder = new ViewHolder();
         if (convertView == null) {
             holder = new ViewHolder();
             if(position%2==0){
@@ -50,6 +55,8 @@ public class NewsAdapter extends BaseAdapter {
                     .findViewById(R.id.autor);
             holder.date = (TextView) convertView
                     .findViewById(R.id.date);
+            holder.imageUrl = (ImageView) convertView
+                    .findViewById(R.id.imageUrl);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
@@ -58,6 +65,9 @@ public class NewsAdapter extends BaseAdapter {
         holder.titre.setText(oneNews.getTitre());
         holder.autor.setText(oneNews.getAutor());
         holder.date.setText(oneNews.getDate());
+        if(oneNews.getImageUrl()!=null && !oneNews.getImageUrl().equals(new String())){
+            Picasso.with(this.context).load(oneNews.getImageUrl()).into((ImageView) convertView.findViewById(R.id.imageUrl));
+        }
         return convertView;
     }
     /**
