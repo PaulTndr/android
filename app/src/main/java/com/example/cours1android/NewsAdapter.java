@@ -41,6 +41,7 @@ public class NewsAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder holder = new ViewHolder();
+        String defaultUrl = "https://i.pinimg.com/originals/71/f9/8c/71f98c77b241fb23cfb5a7573535f455.png";
         if (convertView == null) {
             holder = new ViewHolder();
             if(position%2==0){
@@ -67,6 +68,8 @@ public class NewsAdapter extends BaseAdapter {
         holder.date.setText(oneNews.getDate());
         if(oneNews.getImageUrl()!=null && !oneNews.getImageUrl().equals(new String())){
             Picasso.with(this.context).load(oneNews.getImageUrl()).into((ImageView) convertView.findViewById(R.id.imageUrl));
+        } else {
+            Picasso.with(this.context).load(defaultUrl).into((ImageView) convertView.findViewById(R.id.imageUrl));
         }
         return convertView;
     }
