@@ -23,8 +23,7 @@ public class MainActivity extends AppCompatActivity {
         btn1.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-                Intent monIntent = new Intent(MainActivity.this, Main2Activity.class);
-                monIntent.putExtra("key1", "Une super key value");
+                Intent monIntent = new Intent(MainActivity.this, listNewsActivity.class);
                 startActivity(monIntent);
             }
         });
@@ -33,6 +32,5 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        Log.d("DEBUG", "Starting the application right now");
     }
 }

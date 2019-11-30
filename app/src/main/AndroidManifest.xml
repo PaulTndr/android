@@ -12,8 +12,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".listItem"></activity>
-        <activity android:name=".Main2Activity" />
         <activity android:name=".listNewsActivity" />
         <activity android:name=".MainActivity">
             <intent-filter>

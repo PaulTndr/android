@@ -5,8 +5,11 @@ import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -40,18 +43,40 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-public class listNewsActivity extends AppCompatActivity {
+public class listNewsActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
-    List<News> sourcesNews = new ArrayList<News>();
-
+    ArrayList<Source> listSources = new ArrayList<Source>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_item);
-        Button button1 = (Button) findViewById(R.id.buttondata);
 
         List<NameValuePair> params = new ArrayList<NameValuePair>();
+        //On récupère la liste des sources
+        new WebServiceRequestor(this, "https://newsapi.org/v2/sources?apiKey=d31f5fa5f03443dd8a1b9e3fde92ec34&language=fr",params).execute();
+
+        //On récupère la liste des articles pour une source
         new WebServiceRequestor(this, "https://newsapi.org/v2/everything?apiKey=d31f5fa5f03443dd8a1b9e3fde92ec34&language=fr&sources=google-news-fr",params).execute();
+    }
+
+    public void onItemSelected(AdapterView<?> parent, View view,
+                               int pos, long id) {
+        System.out.println("Searching articles from "+parent.getItemAtPosition(pos));
+        String complementUrl = new String ();
+
+        for(int k=0; k<this.listSources.size();k++){
+            if(parent.getItemAtPosition(pos).toString()==this.listSources.get(k).getName()){
+                complementUrl=this.listSources.get(k).getIdUrl();
+            }
+        }
+        if(!complementUrl.equals(new String())){
+            List<NameValuePair> params = new ArrayList<NameValuePair>();
+            new WebServiceRequestor(this, "https://newsapi.org/v2/everything?apiKey=d31f5fa5f03443dd8a1b9e3fde92ec34&language=fr&sources="+complementUrl,params).execute();
+        }
+    }
+
+    public void onNothingSelected(AdapterView<?> parent) {
+        System.out.println("Nothing selected");
     }
 }
 
@@ -103,33 +128,54 @@ class WebServiceRequestor extends AsyncTask<String, Void, String> {
     protected void onPostExecute(String result)
     {
 
-        System.out.println(result);
+        //Parsing du result vers du format Json
         JsonObject jsonObject = new JsonParser().parse(result).getAsJsonObject();
-        //JsonObject jsonObject = new Gson().fromJson(result, JsonObject.class);
 
-        ArrayList<News> listNews = new ArrayList<News>();
-
-        for (int k=0; k<jsonObject.get("articles").getAsJsonArray().size(); k++){
-            //News oneNews = new Gson().fromJson(jsonObject.get("articles").getAsJsonArray().get(k), News.class);
-            JsonObject jsonObjectForOneNews = jsonObject.get("articles").getAsJsonArray().get(k).getAsJsonObject();
-            News oneNews = new News();
-            oneNews.setTitre(jsonObjectForOneNews.get("title").getAsString());
-            if(!jsonObjectForOneNews.get("author").isJsonNull()){
-                oneNews.setAutor(jsonObjectForOneNews.get("author").getAsString());
+        if(this.URL.contains("/sources")) {{
+            ArrayList<String> listSourcesName = new ArrayList<String>();
+            ArrayList<Source> listSources = new ArrayList<Source>();
+            for (int k = 0; k < jsonObject.get("sources").getAsJsonArray().size(); k++) {
+                JsonObject jsonObjectForOneNews = jsonObject.get("sources").getAsJsonArray().get(k).getAsJsonObject();
+                Source oneSource = new Source();
+                oneSource.setIdUrl(jsonObjectForOneNews.get("id").getAsString());
+                oneSource.setName(jsonObjectForOneNews.get("name").getAsString());
+                listSourcesName.add(oneSource.getName());
+                listSources.add(oneSource);
             }
-            oneNews.setDate(jsonObjectForOneNews.get("publishedAt").getAsString());
-            if(!jsonObjectForOneNews.get("urlToImage").isJsonNull()){
-                oneNews.setImageUrl(jsonObjectForOneNews.get("urlToImage").getAsString());
+            //Set des sources
+            activity.listSources=listSources;
+            Spinner spinner = (Spinner) activity.findViewById(R.id.spinner);
+            spinner.setOnItemSelectedListener(activity);
+            ArrayAdapter<String> adapter = new ArrayAdapter<String>(activity, android.R.layout.simple_spinner_item, listSourcesName);
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            spinner.setAdapter(adapter);
+        }}
+
+        //Si on fait une requete sur /everything
+        if(this.URL.contains("/everything")) {
+            System.out.println("Refresh articles");
+            ArrayList<News> listNews = new ArrayList<News>();
+
+            for (int k = 0; k < jsonObject.get("articles").getAsJsonArray().size(); k++) {
+                //News oneNews = new Gson().fromJson(jsonObject.get("articles").getAsJsonArray().get(k), News.class);
+                JsonObject jsonObjectForOneNews = jsonObject.get("articles").getAsJsonArray().get(k).getAsJsonObject();
+                News oneNews = new News();
+                oneNews.setTitre(jsonObjectForOneNews.get("title").getAsString());
+                if (!jsonObjectForOneNews.get("author").isJsonNull()) {
+                    oneNews.setAutor(jsonObjectForOneNews.get("author").getAsString());
+                }
+                oneNews.setDate(jsonObjectForOneNews.get("publishedAt").getAsString());
+                if (!jsonObjectForOneNews.get("urlToImage").isJsonNull()) {
+                    oneNews.setImageUrl(jsonObjectForOneNews.get("urlToImage").getAsString());
+                }
+                listNews.add(oneNews);
             }
 
-            oneNews.print();
-            listNews.add(oneNews);
+            ListView myListView = (ListView) activity.findViewById(R.id.listView);
+            NewsAdapter adapter = new NewsAdapter(activity, listNews);
+            myListView.setAdapter(adapter);
+            adapter.notifyDataSetChanged();
         }
-
-        ListView myListView = (ListView) activity.findViewById(R.id.listView);
-        NewsAdapter adapter = new NewsAdapter(activity, listNews);
-        myListView.setAdapter(adapter);
-        adapter.notifyDataSetChanged();
         super.onPostExecute(result);
     }
 
