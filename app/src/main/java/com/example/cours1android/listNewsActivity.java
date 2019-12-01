@@ -51,6 +51,9 @@ import java.util.List;
 public class listNewsActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
     ArrayList<Source> listSources = new ArrayList<Source>();
+    ArrayList<String> listSourcesNames = new ArrayList<String>();
+    int checkSpinner = 0;
+    String selectedSource = new String();
     String sourceName;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,13 +65,18 @@ public class listNewsActivity extends AppCompatActivity implements AdapterView.O
         new WebServiceRequestor(this, "https://newsapi.org/v2/sources?apiKey=d31f5fa5f03443dd8a1b9e3fde92ec34&language=fr",params).execute();
 
         //On récupère la liste des articles pour une source
-        new WebServiceRequestor(this, "https://newsapi.org/v2/everything?apiKey=d31f5fa5f03443dd8a1b9e3fde92ec34&language=fr&sources=google-news-fr",params).execute();
-        this.sourceName = "Google News (France)";
+        /*new WebServiceRequestor(this, "https://newsapi.org/v2/everything?apiKey=d31f5fa5f03443dd8a1b9e3fde92ec34&language=fr&sources=google-news-fr",params).execute();
+        this.sourceName = "Google News (France)";*/
     }
 
 
     public void onItemSelected(AdapterView<?> parent, View view,
                                int pos, long id) {
+        if(this.selectedSource.equals(parent.getItemAtPosition(pos).toString()) || this.checkSpinner==0){
+            this.checkSpinner++;
+            System.out.println("AVORTED REQUEST "+this.checkSpinner);
+            return;
+        }
         System.out.println("Searching articles from "+parent.getItemAtPosition(pos));
         String complementUrl = new String ();
 
@@ -79,6 +87,8 @@ public class listNewsActivity extends AppCompatActivity implements AdapterView.O
             }
         }
         if(!complementUrl.equals(new String())){
+            this.selectedSource =parent.getItemAtPosition(pos).toString();
+            setContentView(R.layout.waiting_screen);
             List<NameValuePair> params = new ArrayList<NameValuePair>();
             new WebServiceRequestor(this, "https://newsapi.org/v2/everything?apiKey=d31f5fa5f03443dd8a1b9e3fde92ec34&language=fr&sources="+complementUrl,params).execute();
         }
@@ -86,6 +96,27 @@ public class listNewsActivity extends AppCompatActivity implements AdapterView.O
 
     public void onNothingSelected(AdapterView<?> parent) {
         System.out.println("Nothing selected");
+    }
+
+    public void updateProgress(double loadingPercent){
+        TextView loaderTxt = (TextView) findViewById(R.id.loaderTxt);
+        loaderTxt.setText((int) Math.floor(loadingPercent)+" %");
+    }
+
+    public void setSources(Boolean firstInit){
+        this.checkSpinner = 0;
+        if (firstInit){
+            this.checkSpinner++;
+        }
+        Spinner spinner = (Spinner) findViewById(R.id.spinner);
+        spinner.setOnItemSelectedListener(listNewsActivity.this);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(listNewsActivity.this, android.R.layout.simple_spinner_item, this.listSourcesNames);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+        if(!this.selectedSource.equals(new String())){
+            int spinnerPosition = adapter.getPosition(this.selectedSource);
+            spinner.setSelection(spinnerPosition);
+        }
     }
 }
 
@@ -104,6 +135,7 @@ class WebServiceRequestor extends AsyncTask<String, Void, String> {
     protected String doInBackground(String... params)
     {
         HttpURLConnection urlConnection = null;
+
         try {
             java.net.URL url = new URL(URL);
 
@@ -111,6 +143,9 @@ class WebServiceRequestor extends AsyncTask<String, Void, String> {
                     .openConnection();
 
             InputStream in = urlConnection.getInputStream();
+
+            int totalLength = urlConnection.getContentLength();
+            double loadingPercent = 0;
 
             InputStreamReader isw = new InputStreamReader(in);
 
@@ -121,6 +156,10 @@ class WebServiceRequestor extends AsyncTask<String, Void, String> {
                 char current = (char) data;
                 result+=(current);
                 data = isw.read();
+                if(this.URL.contains("/everything")) {
+                    loadingPercent=(result.length()*100)/totalLength;
+                    this.activity.updateProgress(loadingPercent);
+                }
             }
             return result;
 
@@ -153,11 +192,9 @@ class WebServiceRequestor extends AsyncTask<String, Void, String> {
             }
             //Set des sources
             activity.listSources=listSources;
-            Spinner spinner = (Spinner) activity.findViewById(R.id.spinner);
-            spinner.setOnItemSelectedListener(activity);
-            ArrayAdapter<String> adapter = new ArrayAdapter<String>(activity, android.R.layout.simple_spinner_item, listSourcesName);
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            spinner.setAdapter(adapter);
+            activity.listSourcesNames=listSourcesName;
+            this.activity.setSources(true);
+
         }}
 
         //Si on fait une requete sur /everything
@@ -192,6 +229,7 @@ class WebServiceRequestor extends AsyncTask<String, Void, String> {
                 }
                 listNews.add(oneNews);
             }
+            this.activity.setContentView(R.layout.activity_list_item);
 
             ListView myListView = (ListView) activity.findViewById(R.id.listView);
             NewsAdapter adapter = new NewsAdapter(activity, listNews);
@@ -205,6 +243,7 @@ class WebServiceRequestor extends AsyncTask<String, Void, String> {
                     view.getContext().startActivity(monIntent);
                 }
             });
+            this.activity.setSources(false);
             super.onPostExecute(result);
         }
     }
