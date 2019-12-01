@@ -200,12 +200,6 @@ class WebServiceRequestor extends AsyncTask<String, Void, String> {
             myListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 public void onItemClick(AdapterView<?> parent, View view,
                                         int position, long id) {
-
-                    /*String url = listNews.get(position).getUrlmatch();
-                    if (url != null && !url.equals(new String())){
-                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                        view.getContext().startActivity(intent);
-                    }*/
                     Intent monIntent = new Intent(view.getContext(), DetailNewsActivity.class);
                     monIntent.putExtra("mNews", listNews.get(position));
                     view.getContext().startActivity(monIntent);
